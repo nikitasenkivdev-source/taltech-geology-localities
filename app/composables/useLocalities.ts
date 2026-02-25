@@ -26,7 +26,7 @@ export const useLocalities = () => {
 
         const url = `${baseUrl}?${params.toString()}`
 
-        return await $fetch<LocalitiesResponse>(url)
+        return $fetch<LocalitiesResponse>(url)
     }
 
     return { fetchLocalities }

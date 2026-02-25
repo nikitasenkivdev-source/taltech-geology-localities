@@ -31,6 +31,15 @@ const totalPages = computed(() =>
     Math.ceil(totalCount.value / limit)
 )
 
+const errorMessage = computed(() => {
+  if (!error.value) return null
+  return error.value.message || 'Failed to load data'
+})
+
+const handleRetry = () => {
+  refresh()
+}
+
 const nextPage = () => {
   if (offset.value + limit < totalCount.value) {
     offset.value += limit
@@ -50,7 +59,6 @@ const previousPage = () => {
       Geological Localities
     </h1>
 
-    <!-- Search -->
     <input
         v-model="search"
         type="text"
@@ -58,17 +66,26 @@ const previousPage = () => {
         class="w-full mb-6 p-3 border rounded-lg"
     />
 
-    <!-- Loading -->
     <div v-if="pending" class="text-center">
       Loading...
     </div>
 
-    <!-- Error -->
-    <div v-else-if="error" class="text-red-500 text-center">
-      Something went wrong
+    <div
+        v-else-if="errorMessage"
+        class="text-center mt-6"
+    >
+      <p class="text-red-500 mb-4">
+        {{ errorMessage }}
+      </p>
+
+      <button
+          @click="handleRetry"
+          class="px-4 py-2 border rounded hover:bg-gray-100"
+      >
+        Retry
+      </button>
     </div>
 
-    <!-- List -->
     <div
         v-else-if="localities.length"
         class="grid md:grid-cols-3 gap-6"
@@ -93,14 +110,12 @@ const previousPage = () => {
       </div>
     </div>
 
-    <!-- Empty state -->
     <div v-else class="text-center text-gray-500">
       No results found
     </div>
 
-    <!-- Pagination -->
     <div
-        v-if="totalPages > 1"
+        v-if="totalPages > 1 && !errorMessage"
         class="flex items-center justify-center gap-4 mt-10"
     >
       <button
